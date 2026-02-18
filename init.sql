@@ -14,11 +14,6 @@ CREATE TABLE wallets (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- For this case, only WITHDRAWAL is available
-CREATE TYPE tx_type AS ENUM ('WITHDRAWAL', 'DEPOSIT');
--- For this case, only SUCCESS and FAILED is available. PENDING usually is set if a confirmation is needed. Like waiting for a TOP UP through a payment gateway when depositing money.
-CREATE TYPE tx_status AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
-
 CREATE TABLE transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     wallet_id UUID REFERENCES wallets(id),
@@ -27,3 +22,8 @@ CREATE TABLE transactions (
     status tx_status NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- For this case, only WITHDRAWAL is available
+CREATE TYPE tx_type AS ENUM ('WITHDRAWAL', 'DEPOSIT');
+-- For this case, only SUCCESS and FAILED is available. PENDING usually is set if a confirmation is needed. Like waiting for a TOP UP through a payment gateway when depositing money.
+CREATE TYPE tx_status AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
