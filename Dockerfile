@@ -1,23 +1,24 @@
-# Start from the official Go image
-FROM golang:1.25.1-alpine
+# Stage 1: Build the application in a dedicated build environment
+FROM golang:1.21-alpine AS builder
 
-# Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy go mod and sum files
+# Copy go.mod and go.sum files to leverage Docker cache
 COPY go.mod go.sum ./
 
-# Download all dependencies
+# Download dependencies
 RUN go mod download
 
-# Copy the source from the current directory to the Working Directory inside the container
+# Copy the source code into the container
 COPY . .
 
-# Build the Go app
-RUN go build -o main ./cmd/api/main.go
+# Build the Go app, creating a static binary for a linux env
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/main ./cmd/api
 
-# Expose port 8080 to the outside world
+# Stage 2: Create a minimal production image
+FROM alpine:latest
+
+COPY --from=builder /app/main /main
+
 EXPOSE 8080
-
-# Command to run the executable
-CMD ["./main"]
+CMD ["/main"]
