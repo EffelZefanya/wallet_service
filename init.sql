@@ -11,7 +11,8 @@ CREATE TABLE wallets (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     balance DECIMAL(15, 2) DEFAULT 0.00,
     version INT DEFAULT 0,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 

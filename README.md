@@ -13,3 +13,11 @@ Though there's also an argument that the get balance might be outdated, like 50m
 I chose to use REST API instead of GRPC because from the statement of "A user has a balance in a digital wallet application and wants to perform transactions, including withdrawals and balance inquiries." Since an application is used, I conclude that this back-end will be called right away by the front-end.
 
 I do not use a GRPC because it's usually used in microservice and the application as of now can be finished with a monolith architecture. Using a GRPC will only lead to unnecessary complexities in the future.
+
+## No Password in User Table
+
+Since this project focuses more on the wallet service, I didn't put "password" as a column in the user table. Making a "password" column will require me to create a login and register function, which is outside of this project's scope. This also lead to quicker development process.
+
+## Not every Table has updated_at
+
+To quicken development speed, updated_at are only set in wallet table. It is the only one that will get updated in this case.
