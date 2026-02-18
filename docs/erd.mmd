@@ -1,0 +1,27 @@
+erDiagram
+    USER ||--|| WALLET : owns
+    WALLET ||--o{ TRANSACTION : records
+
+    USER {
+        uuid id PK
+        string username
+        string email UK
+        timestamp created_at
+    }
+
+    WALLET {
+        uuid id PK
+        uuid user_id FK
+        decimal balance
+        int version "Used for Optimistic Locking"
+        timestamp updated_at
+    }
+
+    TRANSACTION {
+        uuid id PK
+        uuid wallet_id FK
+        decimal amount
+        string type "WITHDRAWAL | DEPOSIT"
+        string status "SUCCESS | FAILED"
+        timestamp created_at
+    }
