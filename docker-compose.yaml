@@ -1,4 +1,22 @@
 services:
+  app:
+    build: .
+    container_name: wallet_app
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_USER=wallet_user
+      - DB_PASSWORD=wallet_password
+      - DB_NAME=digital_wallet
+      - DB_PORT=5432
+      - APP_PORT=8080
+      - MAX_RETRIES=3
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
   db:
     image: postgres:15-alpine
     container_name: wallet_db
@@ -12,6 +30,11 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wallet_user -d digital_wallet"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

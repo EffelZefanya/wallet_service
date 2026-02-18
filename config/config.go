@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -10,6 +11,7 @@ import (
 type Config struct {
 	DBDSN   string
 	AppPort string
+	MaxRetries int
 }
 
 func LoadConfig() *Config {
@@ -21,6 +23,7 @@ func LoadConfig() *Config {
 	return &Config{
 		DBDSN:   getDSN(),
 		AppPort: getEnv("APP_PORT", "8080"),
+		MaxRetries: getEnvAsInt("MAX_RETRIES", 3),
 	}
 }
 
@@ -36,6 +39,15 @@ func getDSN() string {
 func getEnv(key, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
+	}
+	return fallback
+}
+
+func getEnvAsInt(key string, fallback int) int {
+	if value, ok := os.LookupEnv(key); ok {
+		if i, err := strconv.Atoi(value); err == nil {
+			return i
+		}
 	}
 	return fallback
 }

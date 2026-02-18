@@ -1,9 +1,12 @@
 package handler
 
 import (
-	"encoding/json"
+	"errors"
 	"net/http"
-	"wallet-microservice/internal/service"
+	"wallet-service/internal/model"
+	"wallet-service/internal/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type WalletHandler struct {
@@ -14,39 +17,52 @@ func NewWalletHandler(s *service.WalletService) *WalletHandler {
 	return &WalletHandler{service: s}
 }
 
-func (h *WalletHandler) Withdraw(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		UserID string  `json:"user_id"`
-		Amount float64 `json:"amount"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request", http.StatusBadRequest)
+func (h *WalletHandler) Withdraw(c *gin.Context) {
+	// Using our DTO
+	var req WithdrawRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request format"})
 		return
 	}
 
-	err := h.service.Withdraw(req.UserID, req.Amount)
+	newBalance, err := h.service.Withdraw(c.Request.Context(), req.UserID, req.Amount)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// Professional tip: map specific errors to status codes
+		code := http.StatusInternalServerError
+		if errors.Is(err, model.ErrInsufficientFunds) {
+			code = http.StatusUnprocessableEntity // 422 is great for business rule violations
+		} else if errors.Is(err, model.ErrConcurrentUpdate) {
+			code = http.StatusConflict // 409 for optimistic locking failures
+		}
+		c.JSON(code, gin.H{"error": err.Error()})
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "withdrawal successful"})
+	c.JSON(http.StatusOK, WithdrawResponse{
+		Message: "withdrawal successful",
+		RemainingBalance: newBalance,
+	})
 }
 
-func (h *WalletHandler) GetBalance(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
+func (h *WalletHandler) GetBalance(c *gin.Context) {
+	userID := c.Query("user_id") // Gin makes query params easy
 	if userID == "" {
-		http.Error(w, "user_id required", http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required"})
 		return
 	}
 
-	balance, err := h.service.GetBalance(userID)
+	balance, err := h.service.GetBalance(c.Request.Context(), userID)
 	if err != nil {
-		http.Error(w, "wallet not found", http.StatusNotFound)
+		if errors.Is(err, model.ErrWalletNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "wallet not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		}
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{"balance": balance})
+	c.JSON(http.StatusOK, BalanceResponse{
+		UserID:  userID,
+		Balance: balance,
+	})
 }

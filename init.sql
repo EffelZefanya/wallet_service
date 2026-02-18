@@ -30,3 +30,11 @@ CREATE TABLE transactions (
     status tx_status NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO users (id, username, email) VALUES 
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'john_doe', 'john@example.com'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'jane_doe', 'jane@example.com');
+
+INSERT INTO wallets (id, user_id, balance, version) VALUES
+('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 1000.00, 1),
+('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 5000.50, 1);

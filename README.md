@@ -12,7 +12,7 @@ Though there's also an argument that the get balance might be outdated, like 50m
 
 I chose to use REST API instead of GRPC because from the statement of "A user has a balance in a digital wallet application and wants to perform transactions, including withdrawals and balance inquiries." Since an application is used, I conclude that this back-end will be called right away by the front-end.
 
-I do not use a GRPC because it's usually used in microservice and the application as of now can be finished with a monolith architecture. Using a GRPC will only lead to unnecessary complexities in the future.
+I do not use a GRPC because it's usually used in service and the application as of now can be finished with a monolith architecture. Using a GRPC will only lead to unnecessary complexities in the future.
 
 ## No Password in User Table
 

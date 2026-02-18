@@ -1,0 +1,71 @@
+{
+  "info": {
+    "_postman_id": "b5a6c7d8-e9f0-1a2b-3c4d-5e6f7g8h9i0j",
+    "name": "Wallet Microservice",
+    "description": "API collection for the Wallet Microservice including Balance Inquiry and Withdrawal.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Balance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/balance?user_id={{user_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "balance"],
+          "query": [
+            {
+              "key": "user_id",
+              "value": "{{user_id}}",
+              "description": "UUID of the user"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Withdraw Funds",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"user_id\": \"{{user_id}}\",\n    \"amount\": 100.00\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/withdraw",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "withdraw"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "type": "string",
+      "description": "John Doe from init.sql"
+    }
+  ]
+}
